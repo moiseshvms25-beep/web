@@ -1,0 +1,55 @@
+<?php
+session_start();
+include("conexion.php");
+
+if($_SERVER['REQUEST_METHOD']=="POST"){
+
+    $usuario = $_POST['usuario'];
+    $clave = $_POST['clave'];
+
+    $consulta = mysqli_query($conexion,"SELECT * FROM usuarios WHERE usuario='$usuario'");
+
+    if(mysqli_num_rows($consulta)==1){
+
+        $datos = mysqli_fetch_assoc($consulta);
+
+        if($datos['clave']==$clave){
+
+            $_SESSION['id']=$datos['id'];
+            $_SESSION['usuario']=$datos['usuario'];
+            $_SESSION['rol']=$datos['rol'];
+            $_SESSION['carpeta']=$datos['carpeta'];
+
+            header("Location: panel.php");
+            exit;
+        }
+    }
+
+    $error="Datos incorrectos";
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login - Drive PRO</title>
+<style>
+body{background:#f3f2f1;font-family:Segoe UI;display:flex;justify-content:center;align-items:center;height:100vh;}
+.box{background:white;padding:40px;width:300px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+button{width:100%;padding:8px;background:#0078d4;color:white;border:none;}
+input{width:100%;padding:8px;margin:10px 0;}
+h2{text-align:center;color:#0078d4;}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>Drive PRO</h2>
+<?php if(isset($error)) echo "<p style='color:red'>$error</p>"; ?>
+<form method="POST">
+<input type="text" name="usuario" placeholder="Usuario" required>
+<input type="password" name="clave" placeholder="Clave" required>
+<button>Entrar</button>
+</form>
+</div>
+</body>
+</html>

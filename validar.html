@@ -1,0 +1,19 @@
+<?php
+session_start();
+include("conexion.php");
+
+$user = $_POST['usuario'];
+$pass = $_POST['password'];
+
+$sql = mysqli_query($conexion,"SELECT * FROM usuarios WHERE usuario='$user' AND password='$pass'");
+
+if(mysqli_num_rows($sql)>0){
+    $datos = mysqli_fetch_assoc($sql);
+    $_SESSION['id']=$datos['id'];
+    $_SESSION['usuario']=$datos['usuario'];
+    $_SESSION['tipo']=$datos['tipo'];
+    header("location:panel.php");
+}else{
+    echo "Datos incorrectos";
+}
+?>

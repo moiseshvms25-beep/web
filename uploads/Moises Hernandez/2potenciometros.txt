@@ -1,0 +1,59 @@
+import processing.serial.*;
+
+Serial puerto;
+
+// Barra 1
+float barra1X;
+float barra1Y;
+float barra1Width = 20;
+float barra1Height = 20;
+
+// Barra 2
+float barra2X;
+float barra2Y;
+float barra2Width = 20;
+float barra2Height = 20;
+
+void setup() {
+  size(400, 400);
+
+  puerto = new Serial(this, Serial.list()[0], 9600);
+
+  // Posición horizontal de las barras
+  barra1X = width / 3 - barra1Width / 2;
+  barra2X = 2 * width / 3 - barra2Width / 2;
+}
+
+void draw() {
+  background(255);
+
+  if (puerto.available() > 0) {
+    String dato = puerto.readStringUntil('\n');
+
+    if (dato != null) {
+      dato = trim(dato);
+      String[] valores = split(dato, ',');
+
+      if (valores.length == 2) {
+        float valorPot1 = float(valores[0]);
+        float valorPot2 = float(valores[1]);
+
+        // Barra 1
+        barra1Height = map(valorPot1, 0, 1023, 10, height);
+        barra1Y = height - barra1Height;
+
+        // Barra 2
+        barra2Height = map(valorPot2, 0, 1023, 10, height);
+        barra2Y = height - barra2Height;
+      }
+    }
+  }
+
+  // Dibujar barra 1 (azul)
+  fill(0, 0, 255);
+  rect(barra1X, barra1Y, barra1Width, barra1Height);
+
+  // Dibujar barra 2 (roja)
+  fill(255, 0, 0);
+  rect(barra2X, barra2Y, barra2Width, barra2Height);
+}

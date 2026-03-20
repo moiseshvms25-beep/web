@@ -1,0 +1,15 @@
+<?php
+include("conexion.php");
+
+$user = $_POST['usuario'];
+$pass = $_POST['password'];
+
+$carpeta = "uploads/".$user;
+
+mkdir($carpeta,0777,true);
+
+mysqli_query($conexion,"INSERT INTO usuarios(usuario,password,carpeta)
+VALUES('$user','$pass','$carpeta')");
+
+echo "Usuario creado";
+?>

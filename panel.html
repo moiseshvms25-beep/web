@@ -1,0 +1,96 @@
+<?php
+session_start();
+include("conexion.php");
+
+if(!isset($_SESSION['usuario'])){
+    header("location:login.php");
+}
+
+$id = $_SESSION['id'];
+$tipo = $_SESSION['tipo'];
+
+$datos = mysqli_fetch_assoc(mysqli_query($conexion,"SELECT * FROM usuarios WHERE id=$id"));
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mi Nube</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+<style>
+body{background:#f4f6f9;}
+.sidebar{
+width:220px;
+height:100vh;
+position:fixed;
+background:#1e3a8a;
+color:white;
+padding:20px;
+}
+.content{
+margin-left:240px;
+padding:20px;
+}
+.card-file{
+padding:15px;
+border-radius:12px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h4>Mi Drive</h4>
+<hr style="background:white">
+<p><?=$_SESSION['usuario']?></p>
+<a href="logout.php" class="btn btn-danger btn-sm">Salir</a>
+</div>
+
+<div class="content">
+
+<h3>Mis archivos</h3>
+
+<form action="subir.php" method="POST" enctype="multipart/form-data" class="mb-4">
+<input type="file" name="archivo">
+<button class="btn btn-primary">Subir archivo</button>
+</form>
+
+<div class="row">
+<?php
+$files = mysqli_query($conexion,"SELECT * FROM archivos WHERE usuario_id=$id");
+
+while($f=mysqli_fetch_assoc($files)){
+?>
+<div class="col-md-3">
+<div class="card-file bg-white mb-3">
+📄 <?=$f['archivo']?>
+</div>
+</div>
+<?php } ?>
+</div>
+
+<?php if($tipo=="admin"){ ?>
+<hr>
+<h4>Crear usuario</h4>
+
+<form action="crear_usuario.php" method="POST" class="row">
+<div class="col-md-3">
+<input name="usuario" class="form-control" placeholder="usuario">
+</div>
+
+<div class="col-md-3">
+<input name="password" class="form-control" placeholder="password">
+</div>
+
+<div class="col-md-2">
+<button class="btn btn-success">Crear</button>
+</div>
+</form>
+<?php } ?>
+
+</div>
+</body>
+</html>

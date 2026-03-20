@@ -1,0 +1,18 @@
+<?php
+session_start();
+include("conexion.php");
+
+$id = $_SESSION['id'];
+
+$datos = mysqli_fetch_assoc(mysqli_query($conexion,"SELECT * FROM usuarios WHERE id=$id"));
+
+$carpeta = $datos['carpeta']."/";
+$nombre = $_FILES['archivo']['name'];
+
+move_uploaded_file($_FILES['archivo']['tmp_name'],$carpeta.$nombre);
+
+mysqli_query($conexion,"INSERT INTO archivos(usuario_id,archivo)
+VALUES('$id','$nombre')");
+
+header("location:panel.php");
+?>

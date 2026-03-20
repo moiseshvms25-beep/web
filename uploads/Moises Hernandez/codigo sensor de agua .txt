@@ -1,0 +1,53 @@
+int adc_id = A0; 
+int HistoryValue = 0;
+char printBuffer[128];
+
+// Pines LEDs y buzzer
+int ledVerde = 4;
+int ledAmarillo = 5;
+int ledRojo = 6;
+int buzzer = 7;
+
+// Ajustar según el sensor
+int UMBRAL = 500;
+
+void setup()
+{
+  Serial.begin(9600);
+
+  pinMode(ledVerde, OUTPUT);
+  pinMode(ledAmarillo, OUTPUT);
+  pinMode(ledRojo, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+}
+
+void loop()
+{
+  int value = analogRead(adc_id); // leer sensor
+
+  if(((HistoryValue>=value) && ((HistoryValue - value) > 10)) ||
+     ((HistoryValue<value) && ((value - HistoryValue) > 10)))
+  {
+    sprintf(printBuffer,"ADC%d level is %d\n",adc_id, value);
+    Serial.print(printBuffer);
+    HistoryValue = value;
+  }
+
+  // SI EL SENSOR ESTA SUMERGIDO
+  if(value > UMBRAL)
+  {
+    digitalWrite(ledVerde, HIGH);
+    digitalWrite(ledAmarillo, HIGH);
+    digitalWrite(ledRojo, HIGH);
+    digitalWrite(buzzer, HIGH);   // sonido
+  }
+  else
+  {
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledAmarillo, LOW);
+    digitalWrite(ledRojo, LOW);
+    digitalWrite(buzzer, LOW);
+  }
+
+  delay(200);
+}

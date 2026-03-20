@@ -1,0 +1,15 @@
+<?php
+include("conexion.php");
+
+$id = $_GET['id'];
+
+$consulta = mysqli_query($conexion,"SELECT * FROM archivos WHERE id=$id");
+$archivo = mysqli_fetch_assoc($consulta);
+
+$ruta = $archivo['ruta'];
+
+if(file_exists($ruta)){
+    header("Content-Disposition: attachment; filename=".$archivo['nombre']);
+    readfile($ruta);
+}
+?>

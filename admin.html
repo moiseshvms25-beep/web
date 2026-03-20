@@ -1,0 +1,85 @@
+<?php
+session_start();
+include("conexion.php");
+
+if($_SESSION['rol']!="admin"){
+header("Location: panel.php");
+exit;
+}
+
+/* CREAR */
+if(isset($_POST['crear'])){
+$usuario=$_POST['usuario'];
+$clave=password_hash($_POST['clave'],PASSWORD_DEFAULT);
+$rol=$_POST['rol'];
+$carpeta=$usuario;
+
+mkdir("uploads/".$carpeta,0777,true);
+
+mysqli_query($conexion,"INSERT INTO usuarios (usuario,clave,rol,carpeta)
+VALUES('$usuario','$clave','$rol','$carpeta')");
+}
+
+/* ELIMINAR */
+if(isset($_GET['eliminar'])){
+$id=$_GET['eliminar'];
+mysqli_query($conexion,"DELETE FROM usuarios WHERE id=$id");
+}
+
+/* ACTUALIZAR */
+if(isset($_POST['actualizar'])){
+$id=$_POST['id'];
+$usuario=$_POST['usuario'];
+$rol=$_POST['rol'];
+
+if(!empty($_POST['clave'])){
+$clave=password_hash($_POST['clave'],PASSWORD_DEFAULT);
+mysqli_query($conexion,"UPDATE usuarios SET usuario='$usuario',rol='$rol',clave='$clave' WHERE id=$id");
+}else{
+mysqli_query($conexion,"UPDATE usuarios SET usuario='$usuario',rol='$rol' WHERE id=$id");
+}
+}
+?>
+
+<h2>Administrar Usuarios</h2>
+<a href="panel.php">Volver</a>
+
+<h3>Crear Usuario</h3>
+<form method="POST">
+<input type="text" name="usuario" placeholder="Usuario" required>
+<input type="password" name="clave" placeholder="Contraseña" required>
+<select name="rol">
+<option value="usuario">Usuario</option>
+<option value="admin">Admin</option>
+</select>
+<button name="crear">Crear</button>
+</form>
+
+<h3>Lista</h3>
+<table border="1">
+<tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Acciones</th></tr>
+
+<?php
+$usuarios=mysqli_query($conexion,"SELECT * FROM usuarios");
+while($u=mysqli_fetch_assoc($usuarios)){
+?>
+<tr>
+<form method="POST">
+<td><?php echo $u['id']; ?></td>
+<td><input type="text" name="usuario" value="<?php echo $u['usuario']; ?>"></td>
+<td>
+<select name="rol">
+<option value="usuario" <?php if($u['rol']=="usuario") echo "selected"; ?>>Usuario</option>
+<option value="admin" <?php if($u['rol']=="admin") echo "selected"; ?>>Admin</option>
+</select>
+</td>
+<td>
+<input type="hidden" name="id" value="<?php echo $u['id']; ?>">
+<input type="password" name="clave" placeholder="Nueva clave">
+<button name="actualizar">Actualizar</button>
+<a href="?eliminar=<?php echo $u['id']; ?>">Eliminar</a>
+</td>
+</form>
+</tr>
+<?php } ?>
+</table>
